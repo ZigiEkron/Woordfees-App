@@ -1,0 +1,252 @@
+// Node 20+ required (native fetch). Install deps: `npm i cheerio p-queue`
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as cheerio from "cheerio";
+import PQueue from "p-queue";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const BASE = "https://woordfees.co.za";
+const PROG_ROOT = `${BASE}/en/programme/`;
+const CHRONO = `${BASE}/en/chronological-programme/`;
+const VENUE_ARCHIVE = `${BASE}/en/program-venue/`;
+
+// ——— helpers ———
+async function get(url, tries = 3) {
+  for (let i = 0; i < tries; i++) {
+    const res = await fetch(url, { headers: { "User-Agent": "WoordfeesApp/1.0" } });
+    if (res.ok) return await res.text();
+    await new Promise(r => setTimeout(r, 500 * (i + 1)));
+  }
+  throw new Error(`GET failed ${url}`);
+}
+const text = (el) => cheerio.load(el).root().text().trim();
+
+function toTime(str) {
+  // "20:30" -> "20:30" (keep as-is); chrono page sometimes shows HH:mm
+  const m = /(\d{1,2}:\d{2})/.exec(str);
+  return m ? m[1] : null;
+}
+function cleanPrice(s) {
+  if (!s) return null;
+  return s.replace(/\s+/g, " ").trim();
+}
+
+// ——— 1) VENUES ———
+async function scrapeVenues() {
+  const out = [];
+  let next = VENUE_ARCHIVE;
+
+  while (next) {
+    const html = await get(next);
+    const $ = cheerio.load(html);
+
+    $(".post-list article").each((_, el) => {
+      const $el = $(el);
+      const name = $el.find("h3").text().trim();
+      if (!name) return;
+
+      const href = $el.find("a:contains('Read more')").attr("href");
+      out.push({
+        id: slugify(name),
+        name,
+        address: $el.find(".post-item__excerpt").text().trim() || undefined,
+        detailUrl: href ? new URL(href, BASE).toString() : undefined,
+      });
+    });
+
+    const $next = $(".pagination a.next");
+    next = $next.attr("href") ? new URL($next.attr("href"), BASE).toString() : null;
+  }
+
+  // hydrate coords if present on detail pages
+  const q = new PQueue({ concurrency: 6 });
+  await Promise.all(
+    out.map((v, i) =>
+      q.add(async () => {
+        if (!v.detailUrl) return;
+        try {
+          const html = await get(v.detailUrl);
+          const $ = cheerio.load(html);
+          // many venue pages embed lat/lng or map links; attempt both
+          const mapLink = $("a[href*='google.com/maps'], a[href^='geo:']").attr("href");
+          const latlng =
+            /@(-?\d+\.\d+),(-?\d+\.\d+)/.exec(mapLink || "") ||
+            /([-]?\d+\.\d+)[,\s]+([-]?\d+\.\d+)/.exec(mapLink || "");
+          if (latlng) {
+            v.lat = parseFloat(latlng[1]);
+            v.lng = parseFloat(latlng[2]);
+          }
+        } catch {}
+      })
+    )
+  );
+
+  // uniq by name
+  const seen = new Set();
+  const uniq = out.filter(v => (seen.has(v.name) ? false : (seen.add(v.name), true)));
+  return uniq;
+}
+
+// ——— 2) PROGRAMME (chronological) ———
+// The chrono page lists items with time, category, title, venue; each item links to a detail page with language, duration, age restriction, price, ticket URL etc.
+async function scrapeProgramme() {
+  let next = CHRONO;
+  const items = [];
+  const q = new PQueue({ concurrency: 8 });
+
+  while (next) {
+    const html = await get(next);
+    const $ = cheerio.load(html);
+
+    $(".chronological-programme__row, .programme-row, li").each((_, el) => {
+      const $el = $(el);
+      // try to detect core fields on the list
+      const time = toTime($el.find(".time, .programme-time").text() || $el.text());
+      const cat = $el.find(".category, .programme-category").text().trim() ||
+                  ($el.text().includes("Theatre") ? "Theatre" : "");
+      const titleLink = $el.find("a[href*='/program/'], a[href*='/programme/']").first();
+      const title = titleLink.text().trim() || $el.find(".title").text().trim();
+      const href = titleLink.attr("href") ? new URL(titleLink.attr("href"), BASE).toString() : null;
+      const venue = $el.find(".venue, .programme-venue").text().trim();
+
+      if (!title || !href) return;
+
+      const stub = {
+        id: slugify(title),
+        title,
+        category: cat || undefined,
+        times: [], // will fill date/time below
+        venueName: venue || undefined,
+        detailUrl: href
+      };
+      if (time) stub.times.push({ dateISO: "", time });
+
+      items.push(stub);
+    });
+
+    const $next = $(".pagination a.next");
+    next = $next.attr("href") ? new URL($next.attr("href"), BASE).toString() : null;
+  }
+
+  // Hydrate detail pages for each programme item
+  const hydrated = [];
+  await Promise.all(
+    items.map(it =>
+      q.add(async () => {
+        try {
+          const html = await get(it.detailUrl);
+          const $ = cheerio.load(html);
+
+          const meta = {};
+          $("li, .single-programme__meta li").each((_, el) => {
+            const t = text(el);
+            if (/^Category/i.test(t)) meta.category = t.replace(/^Category\.\s*/i, "").trim();
+            if (/^Language/i.test(t)) meta.language = t.replace(/^Language\.\s*/i, "").trim();
+            if (/^Age restriction/i.test(t)) meta.ageRestriction = t.replace(/^Age restriction\.\s*/i, "").trim();
+            if (/^Duration/i.test(t)) {
+              const m = /(\d+)\s*Minute/.exec(t);
+              if (m) meta.durationMin = parseInt(m[1], 10);
+            }
+            if (/^Venue/i.test(t)) meta.venueName = t.replace(/^Venue\.\s*/i, "").trim();
+          });
+
+          // Tickets
+          const ticketUrl =
+            $("a[href*='webtickets'], a[href*='quicket'], a:contains('Tickets')").attr("href") || null;
+
+          // Dates/Times (detail page often lists performances)
+          const times = [];
+          $(".single-programme__dates li, .dates li").each((_, el) => {
+            const t = text(el);
+            const dm = /(\d{4}-\d{2}-\d{2})/.exec(t);
+            const hm = /(\d{1,2}:\d{2})/.exec(t);
+            if (dm || hm) {
+              times.push({
+                dateISO: dm ? dm[1] : "",
+                time: hm ? hm[1] : ""
+              });
+            }
+          });
+
+          hydrated.push({
+            id: slugify(it.title),
+            title: it.title,
+            category: meta.category || it.category,
+            language: meta.language,
+            ageRestriction: meta.ageRestriction,
+            durationMin: meta.durationMin,
+            venueId: slugify(meta.venueName || it.venueName || ""),
+            price: undefined, // sometimes shown only on ticket site
+            ticketUrl: ticketUrl ? (new URL(ticketUrl, BASE)).toString() : undefined,
+            detailUrl: it.detailUrl,
+            times: times.length ? times : it.times
+          });
+        } catch (e) {
+          // keep stub if detail failed
+          hydrated.push(it);
+        }
+      })
+    )
+  );
+
+  // merge by id (some items may duplicate across pages)
+  const byId = new Map();
+  for (const p of hydrated) {
+    if (!byId.has(p.id)) byId.set(p.id, p);
+    else {
+      const prev = byId.get(p.id);
+      prev.times = [...(prev.times || []), ...(p.times || [])];
+      byId.set(p.id, prev);
+    }
+  }
+  const arr = [...byId.values()];
+  // drop empties
+  return arr.filter(p => p.title);
+}
+
+function slugify(s) {
+  return (s || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// ——— main ———
+async function main() {
+  const root = path.resolve(__dirname, "..");
+  const assetsDir = path.join(root, "assets");
+  await fs.mkdir(assetsDir, { recursive: true });
+
+  console.log("Scraping venues…");
+  const venuesArr = await scrapeVenues();
+  console.log(`Venues: ${venuesArr.length}`);
+
+  console.log("Scraping programme (chronological + details)…");
+  const programmeArr = await scrapeProgramme();
+  console.log(`Programme items: ${programmeArr.length}`);
+
+  // Create a mapping from venue name -> id to attach venueId’s consistently
+  const byName = new Map(venuesArr.map(v => [v.name.trim().toLowerCase(), v]));
+  for (const p of programmeArr) {
+    if (!p.venueId && p.venueName) {
+      const v = byName.get((p.venueName || "").trim().toLowerCase());
+      if (v) p.venueId = v.id;
+    }
+    delete p.venueName;
+  }
+
+  // Write files
+  await fs.writeFile(path.join(assetsDir, "venues.json"), JSON.stringify(venuesArr, null, 2), "utf-8");
+  await fs.writeFile(path.join(assetsDir, "programme.json"), JSON.stringify(programmeArr, null, 2), "utf-8");
+
+  console.log("Done. Files written to assets/venues.json and assets/programme.json");
+}
+
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
