@@ -1,5 +1,4 @@
-$yml = @'
-name: Deploy Expo Web to GitHub Pages
+﻿name: Deploy Expo Web to GitHub Pages
 
 on:
   push:
@@ -15,6 +14,11 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  CI: true
+  EXPO_NO_TELEMETRY: 1
+  EXPO_USE_STATIC: 1   # needed for static web export with Expo Router
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,33 +26,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Node setup
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: 'npm'
 
-      # If npm ci fails due to a missing/old lockfile, fall back to npm install
-      - name: Install dependencies
+      - name: Print env
         run: |
-          npm ci || npm install
+          node -v
+          npm -v
+          ls -la
+
+      # Install dependencies (fall back if lockfile mismatch)
+      - name: Install deps
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci || npm install
+          else
+            npm install
+          fi
 
       - name: Install Expo CLI
-        run: |
-          npm install -g expo-cli
+        run: npm install -g expo-cli
 
-      # Export the web build explicitly to ./dist (supports both old/new Expo CLIs)
+      # Try both export syntaxes depending on Expo version
       - name: Build Expo web (to dist)
         shell: bash
         run: |
           set -e
           if npx expo export:web --help >/dev/null 2>&1; then
-            npx expo export:web --output-dir dist
+            npx expo export:web --output-dir dist --non-interactive
           else
-            npx expo export --platform web --output-dir dist
+            npx expo export --platform web --output-dir dist --non-interactive
           fi
-          echo "Contents of dist:"
-          ls -la dist || (echo "dist not found" && exit 1)
+          echo "---- dist listing ----"
+          ls -la dist
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -65,5 +78,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-'@
-Set-Content -Path .github\workflows\deploy-pages.yml -Value $yml -Encoding UTF8
