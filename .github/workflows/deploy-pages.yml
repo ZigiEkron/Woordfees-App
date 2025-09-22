@@ -1,34 +1,56 @@
-﻿name: Deploy Expo Web to GitHub Pages
+$yml = @'
+name: Deploy Expo Web to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
+      # If npm ci fails due to a missing/old lockfile, fall back to npm install
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci || npm install
 
-      - name: Build Expo web
-        run: npx expo export:web
+      - name: Install Expo CLI
+        run: |
+          npm install -g expo-cli
 
-      - name: Upload artifact
+      # Export the web build explicitly to ./dist (supports both old/new Expo CLIs)
+      - name: Build Expo web (to dist)
+        shell: bash
+        run: |
+          set -e
+          if npx expo export:web --help >/dev/null 2>&1; then
+            npx expo export:web --output-dir dist
+          else
+            npx expo export --platform web --output-dir dist
+          fi
+          echo "Contents of dist:"
+          ls -la dist || (echo "dist not found" && exit 1)
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -38,8 +60,10 @@ jobs:
     needs: build
     environment:
       name: github-pages
-      url: '${{ steps.deployment.outputs.page_url }}'
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+'@
+Set-Content -Path .github\workflows\deploy-pages.yml -Value $yml -Encoding UTF8
