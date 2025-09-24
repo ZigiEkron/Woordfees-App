@@ -29,6 +29,9 @@
     },
     "web": {
       "output": "static"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
