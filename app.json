@@ -24,7 +24,7 @@
       }
     },
     "experiments": {
-      "baseUrl": "ZigiEkron/Woordfees-App"
+      "baseUrl": "/Woordfees-App"
     },
     "web": {
       "output": "static"
