@@ -10,3 +10,4 @@ yarn-error.log*
 *.zip
 .DS_Store
 Thumbs.db
+NUL
