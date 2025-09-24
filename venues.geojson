@@ -1,0 +1,213 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.86162,
+          -33.94563
+        ]
+      },
+      "properties": {
+        "name": "HS Luckhoff-skoolsaal (Hoërskool Luckhoff)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.86139,
+          -33.93667
+        ]
+      },
+      "properties": {
+        "name": "Ryneveldstraat (reference point, central)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.860151,
+          -33.932106
+        ]
+      },
+      "properties": {
+        "name": "Idasvallei (area centre)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.797764,
+          -33.988635
+        ]
+      },
+      "properties": {
+        "name": "Canettevallei Laventel- & Wynplaas (Vlottenburg)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.866516,
+          -33.934087
+        ]
+      },
+      "properties": {
+        "name": "US Konservatorium – voorportaal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.858525253967287,
+          -33.935831250899746
+        ]
+      },
+      "properties": {
+        "name": "Drostdy-teater (48 Alexander St)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.8609199,
+          -33.9340611
+        ]
+      },
+      "properties": {
+        "name": "Adam Small-ouditorium / Theatre Complex"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.85808,
+          -33.94591
+        ]
+      },
+      "properties": {
+        "name": "kykNET Rhenish Girls’ High"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.8618906,
+          -33.9366775
+        ]
+      },
+      "properties": {
+        "name": "Stadsaal (Town Hall)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.856342,
+          -33.939601
+        ]
+      },
+      "properties": {
+        "name": "Libertasplaas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.86057,
+          -33.93691
+        ]
+      },
+      "properties": {
+        "name": "Moederkerk (NG Moederkerk)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.8208,
+          -33.9456
+        ]
+      },
+      "properties": {
+        "name": "The Daisy Jones Bar (Summerhill Wines)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.874806,
+          -33.936528
+        ]
+      },
+      "properties": {
+        "name": "Maria’s Manor (Stellenbosch Manor)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.862,
+          -33.936
+        ]
+      },
+      "properties": {
+        "name": "Hofmeyrsaal (SU)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.86615,
+          -33.93252
+        ]
+      },
+      "properties": {
+        "name": "Jan Mouton-gebou (Learning Centre)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.866516,
+          -33.934087
+        ]
+      },
+      "properties": {
+        "name": "Fismer Hall (Conservatorium)"
+      }
+    }
+  ]
+}

@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
-      "**/*"
+      "**/*",
+      "app/assets/data/*"
     ],
     "ios": {
       "supportsTablet": true
