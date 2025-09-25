@@ -2,7 +2,7 @@
   "name": "woordfees-app",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@types/react": "~19.1.10",
+    "gh-pages": "^6.3.0",
     "typescript": "~5.9.2"
   }
 }
