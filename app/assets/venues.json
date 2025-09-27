@@ -2,225 +2,225 @@
   {
     "slug": "p-c-petersen-prim-r-kylemore",
     "name": "P.C. Petersen Primêr (Kylemore)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "hs-luckhoff-skoolsaal-ho-rskool-luckhoff",
     "name": "HS Luckhoff-skoolsaal (Hoërskool Luckhoff)",
-    "address": null,
     "lat": -33.94563,
-    "lng": 18.86162
+    "lng": 18.86162,
+    "address": null
   },
   {
     "slug": "ryneveldstraat-reference-point-central",
     "name": "Ryneveldstraat (reference point, central)",
-    "address": null,
     "lat": -33.93667,
-    "lng": 18.86139
+    "lng": 18.86139,
+    "address": null
   },
   {
     "slug": "idasvallei-area-centre",
     "name": "Idasvallei (area centre)",
-    "address": null,
     "lat": -33.932106,
-    "lng": 18.860151
+    "lng": 18.860151,
+    "address": null
   },
   {
     "slug": "canettevallei-laventel-wynplaas-vlottenburg",
     "name": "Canettevallei Laventel- & Wynplaas (Vlottenburg)",
-    "address": null,
     "lat": -33.988635,
-    "lng": 18.797764
+    "lng": 18.797764,
+    "address": null
   },
   {
     "slug": "keetweg-9-mostertsdrif",
     "name": "Keetweg 9, Mostertsdrif",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "us-museum-stellenbosch-university-museum",
     "name": "US Museum (Stellenbosch University Museum)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "us-museum-raadsaal",
     "name": "US Museum – Raadsaal",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "oude-leeskamer-182-dorp-st",
     "name": "Oude Leeskamer (182 Dorp St)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "us-konservatorium-voorportaal",
     "name": "US Konservatorium – voorportaal",
-    "address": null,
     "lat": -33.934087,
-    "lng": 18.866516
+    "lng": 18.866516,
+    "address": null
   },
   {
     "slug": "drostdy-teater-48-alexander-st",
     "name": "Drostdy-teater (48 Alexander St)",
-    "address": null,
     "lat": -33.935831250899746,
-    "lng": 18.858525253967287
+    "lng": 18.858525253967287,
+    "address": null
   },
   {
     "slug": "adam-small-ouditorium-theatre-complex",
     "name": "Adam Small-ouditorium / Theatre Complex",
-    "address": null,
     "lat": -33.9340611,
-    "lng": 18.8609199
+    "lng": 18.8609199,
+    "address": null
   },
   {
     "slug": "mawethustraat-304-khayamandi",
     "name": "Mawethustraat 304, Khayamandi",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "kyknet-rhenish-girls-high",
     "name": "kykNET Rhenish Girls’ High",
-    "address": null,
     "lat": -33.94591,
-    "lng": 18.85808
+    "lng": 18.85808,
+    "address": null
   },
   {
     "slug": "stadsaal-town-hall",
     "name": "Stadsaal (Town Hall)",
-    "address": null,
     "lat": -33.9366775,
-    "lng": 18.8618906
+    "lng": 18.8618906,
+    "address": null
   },
   {
     "slug": "hms-bloemhof-skoolsaal",
     "name": "HMS Bloemhof-skoolsaal",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "libertasplaas",
     "name": "Libertasplaas",
-    "address": null,
     "lat": -33.939601,
-    "lng": 18.856342
+    "lng": 18.856342,
+    "address": null
   },
   {
     "slug": "moederkerk-ng-moederkerk",
     "name": "Moederkerk (NG Moederkerk)",
-    "address": null,
     "lat": -33.93691,
-    "lng": 18.86057
+    "lng": 18.86057,
+    "address": null
   },
   {
     "slug": "spier-manor-house-spier-wine-farm",
     "name": "Spier Manor House (Spier Wine Farm)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "spier-amphitheatre-spier-estate",
     "name": "Spier Amphitheatre (Spier estate)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "erfurthuis-37-ryneveld-st",
     "name": "Erfurthuis (37 Ryneveld St)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "the-daisy-jones-bar-summerhill-wines",
     "name": "The Daisy Jones Bar (Summerhill Wines)",
-    "address": null,
     "lat": -33.9456,
-    "lng": 18.8208
+    "lng": 18.8208,
+    "address": null
   },
   {
     "slug": "open-window-filmstudio-centurion",
     "name": "Open Window Filmstudio (Centurion)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "maria-s-manor-stellenbosch-manor",
     "name": "Maria’s Manor (Stellenbosch Manor)",
-    "address": null,
     "lat": -33.936528,
-    "lng": 18.874806
+    "lng": 18.874806,
+    "address": null
   },
   {
     "slug": "the-khaya-kafee-die-khaya",
     "name": "The Khaya-kafee / Die Khaya",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "hofmeyrsaal-su",
     "name": "Hofmeyrsaal (SU)",
-    "address": null,
     "lat": -33.936,
-    "lng": 18.862
+    "lng": 18.862,
+    "address": null
   },
   {
     "slug": "standard-bank-endler-endler-hall",
     "name": "Standard Bank Endler (Endler Hall)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "jan-mouton-gebou-learning-centre",
     "name": "Jan Mouton-gebou (Learning Centre)",
-    "address": null,
     "lat": -33.93252,
-    "lng": 18.86615
+    "lng": 18.86615,
+    "address": null
   },
   {
     "slug": "neelsie-cinema-neelsie-student-centre",
     "name": "Neelsie Cinema (Neelsie Student Centre)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "bontevlei-venue-annandale-rd",
     "name": "Bontevlei Venue (Annandale Rd)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "the-plataan-kafee-su",
     "name": "The Plataan-kafee (SU)",
-    "address": null,
     "lat": null,
-    "lng": null
+    "lng": null,
+    "address": null
   },
   {
     "slug": "fismer-hall-conservatorium",
     "name": "Fismer Hall (Conservatorium)",
-    "address": null,
     "lat": -33.934087,
-    "lng": 18.866516
+    "lng": 18.866516,
+    "address": null
   }
 ]
