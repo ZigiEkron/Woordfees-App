@@ -1,69 +1,56 @@
-﻿import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
-import programme from "../assets/programme.json";
-import venues from "../assets/venues.json";
+﻿import { Stack, Link } from "expo-router";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { loadEvents } from "./lib/events";
+import { venueLabel, mapsUrl } from "./lib/venues";
 
-type ProgrammeItem = {
-  id?: string | number;
-  title: string;
-  date?: string;
-  time?: string;
-  venueId?: string | number;
-  venue?: string;
-  description?: string;
-  tickets_url?: string;
-};
-
-type Venue = {
-  id?: string | number;
-  name: string;
-  lat?: number;
-  lng?: number;
-  address?: string;
-};
-
-const venuesById = new Map<string | number, Venue>(
-  (venues as Venue[]).map(v => [String(v.id ?? v.name), v])
-);
-
-export default function ScheduleScreen() {
-  const data = (programme as ProgrammeItem[]);
+export default function Schedule() {
+  const events = loadEvents();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Program</Text>
-      <FlatList
-        data={data}
-        keyExtractor={(item, i) => String(item.id ?? i)}
-        ItemSeparatorComponent={() => <View style={styles.sep} />}
-        renderItem={({ item }) => {
-          const venue =
-            item.venue ??
-            venuesById.get(String(item.venueId ?? ""))?.name ??
-            "Onbekende venue";
+    <View style={{ padding: 16 }}>
+      <Stack.Screen options={{ title: "Program" }} />
+      <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 12 }}>Program</Text>
+
+      <ScrollView>
+        {events.map((ev, i) => {
+          const id = ev.id || String(i);
+          const murl = mapsUrl(ev);
           return (
-            <View style={styles.card}>
-              <Text style={styles.event}>{item.title}</Text>
-              <Text style={styles.meta}>
-                {(item.date ?? "").trim()} {(item.time ?? "").trim()} · {venue}
-              </Text>
-              {item.description ? (
-                <Text style={styles.desc}>{item.description}</Text>
-              ) : null}
+            <View key={id} style={{ paddingVertical: 10, borderBottomWidth: 1, borderColor: "#eee", gap: 6 }}>
+              {/* Title → event detail if you have a local screen, else external Woordfees detailUrl */}
+              {ev.detailUrl ? (
+                <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                  <a href={ev.detailUrl} target="_blank" rel="noreferrer">{ev.title}</a>
+                </Text>
+              ) : (
+                <Link href={`/event/${encodeURIComponent(id)}`}>
+                  <Text style={{ fontWeight: "600", fontSize: 16 }}>{ev.title}</Text>
+                </Link>
+              )}
+
+              {/* Venue + map link */}
+              <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+                <Text style={{ color: "#666" }}>• {venueLabel(ev)}</Text>
+                {murl && (
+                  <a href={murl} target="_blank" rel="noreferrer" style={{ color: "#1a73e8" }}>
+                    Wys op kaart
+                  </a>
+                )}
+              </View>
+
+              {/* Tickets (if present) */}
+              {ev.ticketsUrl && (
+                <View>
+                  <a href={ev.ticketsUrl} target="_blank" rel="noreferrer"
+                    style={{ padding: "6px 10px", borderRadius: 8, background: "#1e40af", color: "white", fontSize: 12 }}>
+                    Koop kaartjies
+                  </a>
+                </View>
+              )}
             </View>
           );
-        }}
-      />
+        })}
+      </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, gap: 8 },
-  title: { fontSize: 22, fontWeight: "800", marginBottom: 8 },
-  sep: { height: 8 },
-  card: { padding: 12, borderRadius: 12, backgroundColor: "#fff", elevation: 1, shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
-  event: { fontSize: 16, fontWeight: "700" },
-  meta: { color: "#6B7280", marginTop: 2 },
-  desc: { marginTop: 6, color: "#111827" }
-});

@@ -1,1 +1,194 @@
-[]
+[
+  {
+    "slug": "p-c-petersen-primer-kylemore",
+    "name": "P.C. Petersen Primêr (Kylemore)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "hs-luckhoff-skoolsaal-hoerskool-luckhoff",
+    "name": "HS Luckhoff-skoolsaal (Hoërskool Luckhoff)",
+    "lat": -33.94563,
+    "lng": 18.86162
+  },
+  {
+    "slug": "ryneveldstraat-reference-point-central",
+    "name": "Ryneveldstraat (reference point, central)",
+    "lat": -33.93667,
+    "lng": 18.86139
+  },
+  {
+    "slug": "idasvallei-area-centre",
+    "name": "Idasvallei (area centre)",
+    "lat": -33.932106,
+    "lng": 18.860151
+  },
+  {
+    "slug": "canettevallei-laventel-wynplaas-vlottenburg",
+    "name": "Canettevallei Laventel- & Wynplaas (Vlottenburg)",
+    "lat": -33.988635,
+    "lng": 18.797764
+  },
+  {
+    "slug": "keetweg-9-mostertsdrif",
+    "name": "Keetweg 9, Mostertsdrif",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "us-museum-stellenbosch-university-museum",
+    "name": "US Museum (Stellenbosch University Museum)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "us-museum-raadsaal",
+    "name": "US Museum – Raadsaal",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "oude-leeskamer-182-dorp-st",
+    "name": "Oude Leeskamer (182 Dorp St)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "us-konservatorium-voorportaal",
+    "name": "US Konservatorium – voorportaal",
+    "lat": -33.934087,
+    "lng": 18.866516
+  },
+  {
+    "slug": "drostdy-teater-48-alexander-st",
+    "name": "Drostdy-teater (48 Alexander St)",
+    "lat": -33.935831250899746,
+    "lng": 18.858525253967287
+  },
+  {
+    "slug": "adam-small-ouditorium-theatre-complex",
+    "name": "Adam Small-ouditorium / Theatre Complex",
+    "lat": -33.9340611,
+    "lng": 18.8609199
+  },
+  {
+    "slug": "mawethustraat-304-khayamandi",
+    "name": "Mawethustraat 304, Khayamandi",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "kyknet-rhenish-girls-high",
+    "name": "kykNET Rhenish Girls’ High",
+    "lat": -33.94591,
+    "lng": 18.85808
+  },
+  {
+    "slug": "stadsaal-town-hall",
+    "name": "Stadsaal (Town Hall)",
+    "lat": -33.9366775,
+    "lng": 18.8618906
+  },
+  {
+    "slug": "hms-bloemhof-skoolsaal",
+    "name": "HMS Bloemhof-skoolsaal",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "libertasplaas",
+    "name": "Libertasplaas",
+    "lat": -33.939601,
+    "lng": 18.856342
+  },
+  {
+    "slug": "moederkerk-ng-moederkerk",
+    "name": "Moederkerk (NG Moederkerk)",
+    "lat": -33.93691,
+    "lng": 18.86057
+  },
+  {
+    "slug": "spier-manor-house-spier-wine-farm",
+    "name": "Spier Manor House (Spier Wine Farm)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "spier-amphitheatre-spier-estate",
+    "name": "Spier Amphitheatre (Spier estate)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "erfurthuis-37-ryneveld-st",
+    "name": "Erfurthuis (37 Ryneveld St)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "the-daisy-jones-bar-summerhill-wines",
+    "name": "The Daisy Jones Bar (Summerhill Wines)",
+    "lat": -33.9456,
+    "lng": 18.8208
+  },
+  {
+    "slug": "open-window-filmstudio-centurion",
+    "name": "Open Window Filmstudio (Centurion)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "marias-manor-stellenbosch-manor",
+    "name": "Maria’s Manor (Stellenbosch Manor)",
+    "lat": -33.936528,
+    "lng": 18.874806
+  },
+  {
+    "slug": "the-khaya-kafee-die-khaya",
+    "name": "The Khaya-kafee / Die Khaya",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "hofmeyrsaal-su",
+    "name": "Hofmeyrsaal (SU)",
+    "lat": -33.936,
+    "lng": 18.862
+  },
+  {
+    "slug": "standard-bank-endler-endler-hall",
+    "name": "Standard Bank Endler (Endler Hall)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "jan-mouton-gebou-learning-centre",
+    "name": "Jan Mouton-gebou (Learning Centre)",
+    "lat": -33.93252,
+    "lng": 18.86615
+  },
+  {
+    "slug": "neelsie-cinema-neelsie-student-centre",
+    "name": "Neelsie Cinema (Neelsie Student Centre)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "bontevlei-venue-annandale-rd",
+    "name": "Bontevlei Venue (Annandale Rd)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "the-plataan-kafee-su",
+    "name": "The Plataan-kafee (SU)",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "slug": "fismer-hall-conservatorium",
+    "name": "Fismer Hall (Conservatorium)",
+    "lat": -33.934087,
+    "lng": 18.866516
+  }
+]
