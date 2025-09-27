@@ -1,1 +1,1 @@
-export { default } from "./components/MapNative";
+export { default } from "../components/MapNative";
