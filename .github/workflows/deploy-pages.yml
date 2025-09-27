@@ -1,7 +1,9 @@
-﻿name: Deploy Expo Web to GitHub Pages
+name: Deploy Expo Web to GitHub Pages
+
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+
 permissions:
   contents: read
   pages: write
@@ -15,19 +17,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install deps
         run: npm ci
 
       - name: Build static web
-        run: npx expo export --platform web
+        env:
+          EXPO_NO_TELEMETRY: 1
+          CI: 1
+        run: npx expo export --platform web --output-dir dist --non-interactive
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -41,6 +45,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v4
