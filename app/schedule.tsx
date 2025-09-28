@@ -4,7 +4,7 @@ import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { loadEvents } from "./lib/events";
 import { venueLabel, mapsUrl } from "./lib/venues";
 
-// clean() trims whitespace, filters out "NaN" or empty values
+// Helper to clean text
 function clean(s?: string | null) {
   if (!s) return undefined;
   const t = String(s).replace(/\s+/g, " ").trim();
@@ -60,4 +60,53 @@ export default function Schedule() {
               <Text style={{ color: "#555" }}>
                 • {vLabel ?? "Onbekende venue"}
               </Text>
-              {ev.venueSlug || ev
+              {(ev.venueSlug || ev.venueName) && (
+                <Link
+                  href={mapsUrl(ev.venueSlug, ev.venueName)}
+                  target="_blank"
+                  style={{
+                    fontSize: 12,
+                    backgroundColor: "#1138c7",
+                    color: "#fff",
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 6,
+                  }}
+                >
+                  Wys op kaart
+                </Link>
+              )}
+            </View>
+
+            {/* Event description */}
+            {blurb && (
+              <Text style={{ color: "#333", lineHeight: 20 }}>{blurb}</Text>
+            )}
+
+            {/* Ticket link */}
+            {ev.ticketsUrl && (
+              <TouchableOpacity>
+                <Link
+                  href={ev.ticketsUrl}
+                  target="_blank"
+                  style={{
+                    alignSelf: "flex-start",
+                    fontSize: 12,
+                    backgroundColor: "#1138c7",
+                    color: "#fff",
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 8,
+                    marginTop: 4,
+                  }}
+                >
+                  Koop kaartjies
+                </Link>
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      })}
+    </ScrollView>
+  );
+}
