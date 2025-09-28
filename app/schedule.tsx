@@ -1,77 +1,92 @@
-﻿import { Stack, Link } from "expo-router";
-import { View, Text, ScrollView } from "react-native";
+﻿// app/schedule.tsx
+import { Stack, Link } from "expo-router";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { loadEvents } from "./lib/events";
 import { venueLabel, mapsUrl } from "./lib/venues";
 
-function clean(v?: any) {
-  if (v == null) return undefined;
-  const s = String(v).trim();
+function clean(s?: string | null) {
   if (!s) return undefined;
-  // treat common junk as empty
-  if (s.toLowerCase() === "nan" || s.toLowerCase() === "null" || s === "undefined") return undefined;
-  return s;
-}
-
-function joinParts(parts: (string | undefined)[], sep = " · ") {
-  return parts.filter(Boolean).join(sep);
+  const t = String(s).replace(/\s+/g, " ").trim();
+  return t && t.toLowerCase() !== "nan" ? t : undefined;
 }
 
 export default function Schedule() {
   const events = loadEvents();
 
   return (
-    <View style={{ padding: 16 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: "#fff" }} contentContainerStyle={{ padding: 16, gap: 16 }}>
       <Stack.Screen options={{ title: "Program" }} />
-      <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 12 }}>Program</Text>
 
-      <ScrollView>
-        {events.map((ev, i) => {
-          const id = String(ev.id ?? i);
-          const title = clean(ev.title) ?? "Untitled";
-          const venue = venueLabel(ev);               // shows "Onbekende venue" if unknown
-          const when = joinParts([clean(ev.date), clean(ev.time)]);
-          const murl = mapsUrl(ev);                   // only if venue can be resolved
-          const tickets = clean(ev.ticketsUrl);
+      <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 4 }}>Program</Text>
 
-          return (
-            <View key={id} style={{ paddingVertical: 12, borderBottomWidth: 1, borderColor: "#eee", gap: 6 }}>
-              {/* Title: internal detail if you have it; otherwise external detailUrl if present */}
-              {clean(ev.detailUrl) ? (
-                <Text style={{ fontWeight: "600", fontSize: 16 }}>
-                  <a href={String(ev.detailUrl)} target="_blank" rel="noreferrer">{title}</a>
-                </Text>
-              ) : (
-                <Link href={`/event/${encodeURIComponent(id)}`}>
-                  <Text style={{ fontWeight: "600", fontSize: 16 }}>{title}</Text>
+      {events.map((ev) => {
+        const vLabel = venueLabel(ev.venueName, ev.venueSlug);
+        const blurbFull = clean(ev.description);
+        const blurb = blurbFull && blurbFull.length > 240 ? blurbFull.slice(0, 240) + "…" : blurbFull;
+
+        return (
+          <View key={ev.id} style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "#eee", gap: 6 }}>
+            <Link
+              href={{ pathname: "/event/[id]", params: { id: String(ev.id) } }}
+              style={{ color: "#1138c7", fontWeight: "700", fontSize: 16 }}
+            >
+              {ev.title}
+            </Link>
+
+            {/* Venue line */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Text style={{ color: "#555" }}>
+                • {vLabel ?? "Onbekende venue"}
+              </Text>
+              {ev.venueSlug || ev.venueName ? (
+                <Link
+                  href={mapsUrl(ev.venueSlug, ev.venueName)}
+                  target="_blank"
+                  style={{
+                    fontSize: 12,
+                    backgroundColor: "#1138c7",
+                    color: "#fff",
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 6,
+                  }}
+                >
+                  Wys op kaart
                 </Link>
-              )}
-
-              {/* Meta line(s) – never render raw NaN */}
-              <Text style={{ color: "#666" }}>• {venue}</Text>
-              {when && <Text style={{ color: "#666" }}>• {when}</Text>}
-
-              {/* Actions */}
-              <View style={{ flexDirection: "row", gap: 12, marginTop: 4 }}>
-                {tickets && (
-                  <a
-                    href={tickets}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ padding: "6px 10px", borderRadius: 8, background: "#1e40af", color: "white", fontSize: 12 }}
-                  >
-                    Koop kaartjies
-                  </a>
-                )}
-                {murl && (
-                  <a href={murl} target="_blank" rel="noreferrer" style={{ color: "#1a73e8", fontWeight: 600 }}>
-                    Wys op kaart
-                  </a>
-                )}
-              </View>
+              ) : null}
             </View>
-          );
-        })}
-      </ScrollView>
-    </View>
+
+            {/* NEW: description snippet */}
+            {blurb ? (
+              <Text style={{ color: "#333", lineHeight: 20 }}>
+                {blurb}
+              </Text>
+            ) : null}
+
+            {/* Tickets button (if present) */}
+            {ev.ticketsUrl ? (
+              <TouchableOpacity>
+                <Link
+                  href={ev.ticketsUrl}
+                  target="_blank"
+                  style={{
+                    alignSelf: "flex-start",
+                    fontSize: 12,
+                    backgroundColor: "#1138c7",
+                    color: "#fff",
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 8,
+                    marginTop: 4,
+                  }}
+                >
+                  Koop kaartjies
+                </Link>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        );
+      })}
+    </ScrollView>
   );
 }
