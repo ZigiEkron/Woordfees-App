@@ -1,54 +1,49 @@
-// Robust venue resolver for multiple programme shapes.
-import rawVenues from "../assets/venues.json";
+﻿/** app/lib/venues.ts */
 
-export type Venue = {
+type Venue = {
   slug?: string;
   name: string;
-  lat?: number | null;
-  lng?: number | null;
+  lat?: number;
+  lng?: number;
+  address?: string;
 };
 
-const venues = rawVenues as Venue[];
+type VenueMap = Record<string, Venue>;
 
-// Build lookups
-const bySlug = new Map<string, Venue>();
-const byName = new Map<string, Venue>();
-
-function norm(s?: string) {
-  return (s || "").trim().toLowerCase();
+/** Build a Google Maps URL from a slug or name. */
+export function formatMapLink(slugOrName: string): string {
+  const q = encodeURIComponent(slugOrName.replace(/-/g, " "));
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
 }
 
-for (const v of venues) {
-  if (v.slug) bySlug.set(norm(v.slug), v);
-  byName.set(norm(v.name), v);
+/** Convenience used in schedule.tsx – accepts (slug?, name?) like your calls do. */
+export function mapsUrl(slug?: string, name?: string): string {
+  const key = (slug || name || "").trim();
+  if (!key) return "https://www.google.com/maps";
+  return formatMapLink(key);
 }
 
-export function resolveVenue(ev: any): Venue | undefined {
-  // Try slugs first (programme.min.json often has venueSlug)
-  const slug =
-    ev?.venueSlug ?? ev?.venue_slug ?? ev?.venue?.slug ?? ev?.venue?.id ?? ev?.venueId ?? ev?.venue_id;
-  if (slug && bySlug.get(norm(String(slug)))) return bySlug.get(norm(String(slug)));
-
-  // Try names (programme.json often has venue_name)
-  const name = ev?.venue_name ?? ev?.venue?.name ?? ev?.venueName;
-  if (name && byName.get(norm(String(name)))) return byName.get(norm(String(name)));
-
-  return undefined;
+/** Pretty label used in schedule.tsx – accepts (name, slug?) like your calls do. */
+export function venueLabel(name: string, slug?: string): string {
+  if (name && name.trim().length > 0) return name;
+  if (slug && slug.trim().length > 0) return slug.replace(/-/g, " ");
+  return "Venue";
 }
 
-export function venueLabel(ev: any) {
-  return resolveVenue(ev)?.name ?? "Onbekende venue";
-}
-
-export function mapsUrl(ev: any) {
-  const v = resolveVenue(ev);
-  if (!v) return undefined;
-
-  // Prefer precise lat/lng if present
-  if (v.lat != null && v.lng != null) {
-    const q = `${v.lat},${v.lng}`;
-    return `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=15`;
+/**
+ * Load venues from assets/venues.json and return a map keyed by slug (if present),
+ * otherwise by lowercased name.
+ */
+export async function loadVenues(): Promise<VenueMap> {
+  // Static import works in Expo web build for JSON in assets/
+  const data = require("../assets/venues.json") as Venue[]; // relative to app/lib/venues.ts -> app/assets/venues.json
+  const map: VenueMap = {};
+  for (const v of data) {
+    const key =
+      (v.slug && v.slug.toLowerCase()) ||
+      (v.name && v.name.toLowerCase());
+    if (!key) continue;
+    map[key] = v;
   }
-  // Fallback: search by name
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}`;
+  return map;
 }
