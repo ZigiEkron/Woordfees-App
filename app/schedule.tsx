@@ -1,112 +1,66 @@
-﻿// app/schedule.tsx
-import { Stack, Link } from "expo-router";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { loadEvents } from "./lib/events";
-import { venueLabel, mapsUrl } from "./lib/venues";
+﻿import { ScrollView, View } from "react-native";
+import { Text, Card, Button } from "react-native-paper";
+import BrandHeader from "../components/BrandHeader";
 
-// Helper to clean text
-function clean(s?: string | null) {
-  if (!s) return undefined;
-  const t = String(s).replace(/\s+/g, " ").trim();
-  return t && t.toLowerCase() !== "nan" ? t : undefined;
-}
-
-export default function Schedule() {
-  const events = loadEvents();
+export default function Schedule({ events = [] }) {
+  // If your events come via props or context, keep that logic.
+  // Otherwise, replace this with your existing event loading code.
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: "#fff" }}
-      contentContainerStyle={{ padding: 16, gap: 16 }}
-    >
-      <Stack.Screen options={{ title: "Program" }} />
+    <ScrollView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
+      <BrandHeader title="Program" />
 
-      <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 4 }}>
-        Program
-      </Text>
-
-      {events.map((ev) => {
-        const vLabel = venueLabel(ev.venueName, ev.venueSlug);
-        const blurbFull = clean(ev.description);
-        const blurb =
-          blurbFull && blurbFull.length > 850
-            ? blurbFull.slice(0, 850) + "…"
-            : blurbFull;
-
-        return (
-          <View
-            key={ev.id}
+      <View style={{ padding: 16, gap: 16 }}>
+        {events.map((ev, idx) => (
+          <Card
+            key={idx}
             style={{
-              paddingVertical: 12,
-              borderBottomWidth: 1,
-              borderBottomColor: "#eee",
-              gap: 6,
+              borderRadius: 16,
+              backgroundColor: "white",
+              elevation: 2,
             }}
           >
-            {/* Event title */}
-            <Link
-              href={{ pathname: "/event/[id]", params: { id: String(ev.id) } }}
-              style={{
-                color: "#1138c7",
-                fontWeight: "700",
-                fontSize: 16,
-              }}
-            >
-              {ev.title}
-            </Link>
-
-            {/* Venue and map link */}
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-              <Text style={{ color: "#555" }}>
-                • {vLabel ?? "Onbekende venue"}
+            <Card.Content style={{ paddingBottom: 4 }}>
+              <Text
+                variant="titleMedium"
+                style={{
+                  fontWeight: "700",
+                  color: "#FF6F66", // coralDark
+                  marginBottom: 4,
+                }}
+              >
+                {ev.title || ev.Produksie}
               </Text>
-              {(ev.venueSlug || ev.venueName) && (
-                <Link
-                  href={mapsUrl(ev.venueSlug, ev.venueName)}
-                  target="_blank"
-                  style={{
-                    fontSize: 12,
-                    backgroundColor: "#1138c7",
-                    color: "#fff",
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 6,
-                  }}
-                >
-                  Wys op kaart
-                </Link>
-              )}
-            </View>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  fontStyle: "italic",
+                  opacity: 0.7,
+                  marginBottom: 6,
+                }}
+              >
+                {ev.venueName || ev.Venue || "Venue"}
+              </Text>
+              <Text variant="bodySmall" style={{ color: "#333", lineHeight: 20 }}>
+                {ev.description || ev.Info || ""}
+              </Text>
+            </Card.Content>
 
-            {/* Event description */}
-            {blurb && (
-              <Text style={{ color: "#333", lineHeight: 20 }}>{blurb}</Text>
-            )}
-
-            {/* Ticket link */}
-            {ev.ticketsUrl && (
-              <TouchableOpacity>
-                <Link
-                  href={ev.ticketsUrl}
-                  target="_blank"
-                  style={{
-                    alignSelf: "flex-start",
-                    fontSize: 12,
-                    backgroundColor: "#1138c7",
-                    color: "#fff",
-                    paddingHorizontal: 10,
-                    paddingVertical: 6,
-                    borderRadius: 8,
-                    marginTop: 4,
-                  }}
+            <Card.Actions style={{ justifyContent: "flex-end" }}>
+              {ev.tickets_url && (
+                <Button
+                  mode="contained"
+                  buttonColor="#FF8B82"
+                  textColor="white"
+                  onPress={() => window.open(ev.tickets_url, "_blank")}
                 >
                   Koop kaartjies
-                </Link>
-              </TouchableOpacity>
-            )}
-          </View>
-        );
-      })}
+                </Button>
+              )}
+            </Card.Actions>
+          </Card>
+        ))}
+      </View>
     </ScrollView>
   );
 }
