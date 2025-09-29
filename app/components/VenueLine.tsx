@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from "react-native";
-import { formatMapLink } from "../lib/venues";
+import { formatMapLink } from "\.\.\/\.\.\/lib\/venues";
 
 type Venue = { name?: string|null; lat?: number|null; lng?: number|null };
 type Links = { venue_map?: string|null };

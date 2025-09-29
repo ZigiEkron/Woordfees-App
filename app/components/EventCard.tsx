@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from "react-native";
 import { Link } from "expo-router";
-import { formatMapLink } from "../lib/venues";
+import { formatMapLink } from "\.\.\/\.\.\/lib\/venues";
 
 export type Price = { text?: string|null };
 export type Links = { tickets?: string|null; detail?: string|null; venue_map?: string|null };

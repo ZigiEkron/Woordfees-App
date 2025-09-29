@@ -1,8 +1,8 @@
-﻿// app/schedule.tsx
+// app/schedule.tsx
 import { ScrollView, View } from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import BrandHeader from "../components/BrandHeader";
-import { formatMapLink } from "./lib/venues"; // our flexible helper
+import { formatMapLink } from "\.\.\/lib\/venues"; // our flexible helper
 
 // --- build-time data imports so GitHub Pages works ---
 const rawProgramme = require("./assets/programme.json") as any[];
