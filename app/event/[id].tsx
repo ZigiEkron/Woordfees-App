@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from "react-native";
 import VenueLine from "../components/VenueLine";
-import { loadVenues } from "../lib/venues";
+import { loadVenues } from "\.\.\/\.\.\/lib\/venues";
 
 type Links = { tickets?: string|null; detail?: string|null; venue_map?: string|null };
 type Venue = { name?: string|null; slug?: string|null; lat?: number|null; lng?: number|null };

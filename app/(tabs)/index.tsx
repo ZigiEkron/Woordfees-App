@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, RefreshControl, View, ActivityIndicator } from "react-native";
 import EventCard, { EventItem } from "../components/EventCard";
-import { loadVenues } from "../lib/venues";
+import { loadVenues } from "\.\.\/\.\.\/lib\/venues";
 
 export default function EventsScreen() {
   const [items, setItems] = useState<EventItem[]>([]);
