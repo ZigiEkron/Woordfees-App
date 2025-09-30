@@ -1,39 +1,58 @@
-import React, { useEffect, useState } from "react";
-import { ScrollView, RefreshControl, View, ActivityIndicator } from "react-native";
+// app/(tabs)/index.tsx
+import { useMemo } from "react";
+import { FlatList } from "react-native";
+import ScreenShell from "../components/ScreenShell";
 import EventCard, { EventItem } from "../components/EventCard";
-import { loadVenues } from "\.\.\/\.\.\/lib\/venues";
+
+// Build-time import so it works on GitHub Pages
+const rawProgramme = require("../assets/programme.json") as any[];
+
+function mapRow(r: any, i: number): EventItem {
+  const title =
+    r.title ?? r.Produksie ?? r.name ?? `Item ${i + 1}`;
+  const description =
+    r.description ?? r.Info ?? r.Beskrywing ?? "";
+  const venueName =
+    r.venueName ?? r.Venue ?? r.venue ?? r.location ?? r.Ligging ?? "";
+  const ticketsUrl =
+    r.tickets_url ??
+    r.ticket_url ??
+    r.ticketsUrl ??
+    r.Tickets ??
+    r.kaartjies_url ??
+    r.buy_tickets ??
+    r.buy_url ??
+    r.url ??
+    null;
+
+  return {
+    id: r.id ?? i,
+    title,
+    description,
+    venueLabel: venueName || "Venue",
+    venueMapUrl: "", // EventCard computes/uses its own map link via helpers
+    ticketsUrl: ticketsUrl ? String(ticketsUrl) : null,
+    // keep any other fields EventCard uses:
+    venue: r.venue ?? { lat: r.lat, lng: r.lng },
+    links: { venue_map: r.venue_map },
+  } as EventItem;
+}
 
 export default function EventsScreen() {
-  const [items, setItems] = useState<EventItem[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  async function load() {
-    setRefreshing(true);
-    const [raw, vdict] = await Promise.all([
-      fetch(require("../assets/data/programme.slim.json")).then(r => r.json()),
-      loadVenues()
-    ]);
-    const hydrated: EventItem[] = raw.map((e: EventItem) => {
-      if (e.venue?.name || !e.venue?.slug) return e;
-      const v = vdict[e.venue.slug];
-      return v ? { ...e, venue: { ...e.venue, name: v.name, lat: v.lat, lng: v.lng } } : e;
-    });
-    setItems(hydrated);
-    setRefreshing(false);
-    setLoading(false);
-  }
-
-  useEffect(() => { load(); }, []);
-
-  if (loading) {
-    return <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><ActivityIndicator /></View>;
-  }
+  const items = useMemo<EventItem[]>(
+    () => (Array.isArray(rawProgramme) ? rawProgramme.map(mapRow) : []),
+    []
+  );
 
   return (
-    <ScrollView style={{ padding: 16 }}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={load} />}>
-      {items.map(ev => (<EventCard key={ev.id} event={ev} />))}
-    </ScrollView>
+    // scroll={false} so FlatList controls scrolling; consistent brand header & background
+    <ScreenShell title="Program" scroll={false}>
+      <FlatList
+        data={items}
+        keyExtractor={(it) => String(it.id)}
+        contentContainerStyle={{ paddingTop: 0, paddingBottom: 24, gap: 16 }}
+        renderItem={({ item }) => <EventCard event={item} />}
+      />
+    </ScreenShell>
   );
 }
