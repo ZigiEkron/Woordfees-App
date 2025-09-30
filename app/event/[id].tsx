@@ -1,25 +1,37 @@
+// app/event/[id].tsx
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from "react-native";
+import { View, ScrollView, TouchableOpacity, Linking, ActivityIndicator, Platform } from "react-native";
+import { Text, Button, Card } from "react-native-paper";
+import ScreenShell from "../components/ScreenShell";
 import VenueLine from "../components/VenueLine";
-import { loadVenues } from "\.\.\/\.\.\/lib\/venues";
+import { loadVenues } from "../../lib/venues";
 
-type Links = { tickets?: string|null; detail?: string|null; venue_map?: string|null };
-type Venue = { name?: string|null; slug?: string|null; lat?: number|null; lng?: number|null };
+// ---- Types (kept compatible with your data) ----
+type Links = { tickets?: string | null; detail?: string | null; venue_map?: string | null };
+type Venue = { name?: string | null; slug?: string | null; lat?: number | null; lng?: number | null };
 
 type EventItem = {
   id: string;
   title: string;
-  datetime?: string|null;
-  date?: string|null;
-  time?: string|null;
-  description?: string|null;
-  category?: string|null;
-  language?: string|null;
-  price?: { text?: string|null };
+  datetime?: string | null;
+  date?: string | null;
+  time?: string | null;
+  description?: string | null;
+  category?: string | null;
+  language?: string | null;
+  price?: { text?: string | null };
   links?: Links;
   venue?: Venue;
 };
+
+function openUrl(url: string) {
+  if (Platform.OS === "web") {
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+  } else {
+    Linking.openURL(url);
+  }
+}
 
 export default function EventDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,53 +40,100 @@ export default function EventDetail() {
 
   useEffect(() => {
     (async () => {
+      // Build-time asset URL; fetch at runtime so static export works
+      const programmeUrl = require("../assets/data/programme.slim.json");
       const [raw, vdict] = await Promise.all([
-        fetch(require("../assets/data/programme.slim.json")).then(r => r.json()),
-        loadVenues()
+        fetch(programmeUrl).then((r) => r.json()),
+        loadVenues(),
       ]);
-      const hydrated: EventItem[] = raw.map((e: EventItem) => {
+
+      const hydrated: EventItem[] = (raw as EventItem[]).map((e) => {
         if (e.venue?.name || !e.venue?.slug) return e;
         const v = vdict[e.venue.slug];
         return v ? { ...e, venue: { ...e.venue, name: v.name, lat: v.lat, lng: v.lng } } : e;
+        // vdict keys are slugs; we enrich venue name/coords when missing
       });
-      const found = hydrated.find(e => e.id === id);
+
+      const found = hydrated.find((e) => e.id === id);
       setEvent(found || null);
       setLoading(false);
     })();
   }, [id]);
 
   if (loading) {
-    return <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><ActivityIndicator /></View>;
+    return (
+      <ScreenShell title="Program">
+        <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 32 }}>
+          <ActivityIndicator />
+          <Text style={{ marginTop: 12 }}>Laai besonderhede…</Text>
+        </View>
+      </ScreenShell>
+    );
   }
+
   if (!event) {
-    return <View style={{ padding: 16 }}><Text style={{ fontSize: 18, fontWeight: "600" }}>Event not found</Text></View>;
+    return (
+      <ScreenShell title="Program">
+        <Card style={{ borderRadius: 16 }}>
+          <Card.Content>
+            <Text variant="titleMedium" style={{ fontWeight: "700" }}>
+              Item nie gevind nie
+            </Text>
+            <Text variant="bodySmall" style={{ marginTop: 6 }}>
+              Ons kon nie ’n gebeurtenis met ID <Text style={{ fontWeight: "700" }}>{id}</Text> vind nie.
+            </Text>
+          </Card.Content>
+        </Card>
+      </ScreenShell>
+    );
   }
 
   const when = event.datetime
     ? event.datetime.replace("T", " · ")
     : event.date && event.time
-      ? `${event.date} · ${event.time}`
-      : event.date || event.time || "";
+    ? `${event.date} · ${event.time}`
+    : event.date || event.time || "";
 
   return (
-    <ScrollView style={{ padding: 16 }}>
-      <Text style={{ fontSize: 22, fontWeight: "700" }}>{event.title}</Text>
-      {!!when && <Text style={{ color: "#666", marginTop: 4 }}>{(when)}</Text>}
-      {(event.category || event.language) && (
-        <Text style={{ color: "#666", marginTop: 4 }}>
-          {[event.category, event.language].filter(Boolean).join(" • ")}
+    <ScreenShell title="Program">
+      <ScrollView>
+        <Text variant="titleLarge" style={{ fontWeight: "700" }}>
+          {event.title}
         </Text>
-      )}
 
-      <VenueLine venue={event.venue} links={event.links} />
+        {!!when && (
+          <Text variant="bodyMedium" style={{ opacity: 0.75, marginTop: 4 }}>
+            {when}
+          </Text>
+        )}
 
-      {!!event.links?.tickets && (
-        <TouchableOpacity style={{ marginTop: 16 }} onPress={() => Linking.openURL(event.links!.tickets!)}>
-          <Text style={{ color: "#2563eb" }}>Buy tickets</Text>
-        </TouchableOpacity>
-      )}
+        {(event.category || event.language) && (
+          <Text variant="bodySmall" style={{ opacity: 0.75, marginTop: 4 }}>
+            {[event.category, event.language].filter(Boolean).join(" • ")}
+          </Text>
+        )}
 
-      {!!event.description && <Text style={{ marginTop: 16, lineHeight: 22 }}>{event.description}</Text>}
-    </ScrollView>
+        {/* Venue line (your existing component) */}
+        <View style={{ marginTop: 12 }}>
+          <VenueLine venue={event.venue} links={event.links} />
+        </View>
+
+        {/* Tickets */}
+        {!!event.links?.tickets && (
+          <View style={{ marginTop: 16, flexDirection: "row", gap: 8, justifyContent: "flex-end" }}>
+            <Button mode="contained" onPress={() => openUrl(event.links!.tickets!)}>
+              Koop kaartjies
+            </Button>
+          </View>
+        )}
+
+        {/* Description */}
+        {!!event.description && (
+          <Text variant="bodyMedium" style={{ marginTop: 16, lineHeight: 22 }}>
+            {event.description}
+          </Text>
+        )}
+      </ScrollView>
+    </ScreenShell>
   );
 }
