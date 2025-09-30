@@ -4,8 +4,9 @@ import { View, Image, Text, StyleSheet, useWindowDimensions } from "react-native
 export default function BrandHeader() {
   const { width } = useWindowDimensions();
 
-  // Responsive scaling: shrink Netwerk24 logo slightly on small screens
-  const netwerkWidth = width < 400 ? 200 : width < 600 ? 250 : 300;
+  // 🔹 Netwerk24 logo now 3x larger than before (fully 9x original)
+  // with responsive scaling for smaller screens
+  const netwerkWidth = width < 400 ? 300 : width < 600 ? 450 : 600;
   const netwerkHeight = netwerkWidth / 2.5;
 
   return (
@@ -19,7 +20,7 @@ export default function BrandHeader() {
         <Text style={styles.subtitle}>Toyota US Woordfees</Text>
       </View>
 
-      {/* Right side: Large Netwerk24 logo */}
+      {/* Right side: Huge Netwerk24 logo */}
       <Image
         source={require("../assets/logos/netwerk24.png")}
         style={[styles.netwerkLogo, { width: netwerkWidth, height: netwerkHeight }]}
