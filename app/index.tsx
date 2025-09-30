@@ -1,32 +1,31 @@
-﻿import { View, Text, StyleSheet, Pressable } from "react-native";
+﻿// app/index.tsx
+import { View } from "react-native";
+import { Text, Button } from "react-native-paper";
 import { Link } from "expo-router";
+import ScreenShell from "./components/ScreenShell";
 
 export default function Home() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Woordfees</Text>
-      <Text style={styles.sub}>Kies ’n skerm om voort te gaan:</Text>
+    <ScreenShell title="Woordfees" scroll={false}>
+      <View style={{ gap: 16, paddingTop: 8 }}>
+        <Text variant="titleLarge" style={{ fontWeight: "800", marginBottom: 2 }}>
+          Kies ’n skerm om voort te gaan:
+        </Text>
 
-      <View style={styles.buttons}>
-        <Link href="/schedule" asChild>
-          <Pressable style={styles.btn}><Text style={styles.btnText}>Program</Text></Pressable>
-        </Link>
-        <Link href="/map" asChild>
-          <Pressable style={styles.btn}><Text style={styles.btnText}>Venues / Kaart</Text></Pressable>
-        </Link>
-        <Link href="/tickets" asChild>
-          <Pressable style={styles.btn}><Text style={styles.btnText}>Kaartjies</Text></Pressable>
-        </Link>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+          <Link href="/schedule" asChild>
+            <Button mode="contained">Program</Button>
+          </Link>
+
+          <Link href="/map" asChild>
+            <Button mode="outlined">Venues / Kaart</Button>
+          </Link>
+
+          <Link href="/tickets" asChild>
+            <Button mode="outlined">Kaartjies</Button>
+          </Link>
+        </View>
       </View>
-    </View>
+    </ScreenShell>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
-  title: { fontSize: 28, fontWeight: "800" },
-  sub: { color: "#6B7280" },
-  buttons: { flexDirection: "row", gap: 12, marginTop: 10, flexWrap: "wrap", justifyContent: "center" },
-  btn: { backgroundColor: "#F59E0B", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 },
-  btnText: { color: "#111827", fontWeight: "700" }
-});
