@@ -15,7 +15,7 @@ export default function BrandHeader({ title = "Program" }: { title?: string }) {
           </View>
         </View>
         <Image
-          source={require("../assets/logos/netwerk24.png")}
+          source={require("../assets/logos/Netwerk24_logo.png")}
           style={{ width: 90, height: 26, resizeMode: "contain", opacity: 0.95 }}
         />
       </View>
