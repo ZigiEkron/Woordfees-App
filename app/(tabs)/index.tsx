@@ -1,58 +1,72 @@
-// app/(tabs)/index.tsx
-import { useMemo } from "react";
-import { FlatList } from "react-native";
-import ScreenShell from "../components/ScreenShell";
-import EventCard, { EventItem } from "../components/EventCard";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 
-// Build-time import so it works on GitHub Pages
-const rawProgramme = require("../assets/programme.json") as any[];
-
-function mapRow(r: any, i: number): EventItem {
-  const title =
-    r.title ?? r.Produksie ?? r.name ?? `Item ${i + 1}`;
-  const description =
-    r.description ?? r.Info ?? r.Beskrywing ?? "";
-  const venueName =
-    r.venueName ?? r.Venue ?? r.venue ?? r.location ?? r.Ligging ?? "";
-  const ticketsUrl =
-    r.tickets_url ??
-    r.ticket_url ??
-    r.ticketsUrl ??
-    r.Tickets ??
-    r.kaartjies_url ??
-    r.buy_tickets ??
-    r.buy_url ??
-    r.url ??
-    null;
-
-  return {
-    id: r.id ?? i,
-    title,
-    description,
-    venueLabel: venueName || "Venue",
-    venueMapUrl: "", // EventCard computes/uses its own map link via helpers
-    ticketsUrl: ticketsUrl ? String(ticketsUrl) : null,
-    // keep any other fields EventCard uses:
-    venue: r.venue ?? { lat: r.lat, lng: r.lng },
-    links: { venue_map: r.venue_map },
-  } as EventItem;
-}
-
-export default function EventsScreen() {
-  const items = useMemo<EventItem[]>(
-    () => (Array.isArray(rawProgramme) ? rawProgramme.map(mapRow) : []),
-    []
-  );
+export default function IndexScreen() {
+  const router = useRouter();
 
   return (
-    // scroll={false} so FlatList controls scrolling; consistent brand header & background
-    <ScreenShell title="Program" scroll={false}>
-      <FlatList
-        data={items}
-        keyExtractor={(it) => String(it.id)}
-        contentContainerStyle={{ paddingTop: 0, paddingBottom: 24, gap: 16 }}
-        renderItem={({ item }) => <EventCard event={item} />}
-      />
-    </ScreenShell>
+    <View style={styles.container}>
+      {/* Optional heading */}
+      <Text style={styles.heading}>Woordfees Programme</Text>
+
+      {/* Three vertically stacked tabs */}
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => router.push("/schedule")}
+      >
+        <Text style={styles.tabText}>Programme</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => router.push("/venues")}
+      >
+        <Text style={styles.tabText}>Venues</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => router.push("/map")}
+      >
+        <Text style={styles.tabText}>Map</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF",
+    alignItems: "center", // Centers horizontally
+    justifyContent: "center", // Centers vertically
+    paddingHorizontal: 20,
+  },
+  heading: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#1B5E20",
+    marginBottom: 32,
+    textAlign: "center",
+  },
+  tabButton: {
+    backgroundColor: "#FF7E79",
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    marginVertical: 10,
+    width: "70%", // keeps consistent button width
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tabText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
