@@ -1,20 +1,29 @@
 import React from "react";
-import { View, Image, Text, StyleSheet } from "react-native";
+import { View, Image, Text, StyleSheet, useWindowDimensions } from "react-native";
 
 export default function BrandHeader() {
+  const { width } = useWindowDimensions();
+
+  // Responsive scaling: shrink Netwerk24 logo slightly on small screens
+  const netwerkWidth = width < 400 ? 200 : width < 600 ? 250 : 300;
+  const netwerkHeight = netwerkWidth / 2.5;
+
   return (
     <View style={styles.header}>
-      <View style={styles.logoContainer}>
+      {/* Left side: Woordfees logo + tagline */}
+      <View style={styles.leftContainer}>
         <Image
           source={require("../assets/logos/woordfees.png")}
           style={styles.woordfeesLogo}
         />
-        <Image
-          source={require("../assets/logos/netwerk24.png")}
-          style={styles.netwerkLogo}
-        />
+        <Text style={styles.subtitle}>Toyota US Woordfees</Text>
       </View>
-      <Text style={styles.subtitle}>Toyota US Woordfees</Text>
+
+      {/* Right side: Large Netwerk24 logo */}
+      <Image
+        source={require("../assets/logos/netwerk24.png")}
+        style={[styles.netwerkLogo, { width: netwerkWidth, height: netwerkHeight }]}
+      />
     </View>
   );
 }
@@ -22,30 +31,28 @@ export default function BrandHeader() {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: "#FF7E79",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  leftContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
   woordfeesLogo: {
     width: 40,
     height: 40,
     resizeMode: "contain",
-    marginRight: 8,
-  },
-  netwerkLogo: {
-    width: 100,
-    height: 40,
-    resizeMode: "contain",
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 12,
     color: "#FFFFFF",
     fontWeight: "600",
+  },
+  netwerkLogo: {
+    resizeMode: "contain",
   },
 });
