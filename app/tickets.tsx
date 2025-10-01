@@ -1,101 +1,71 @@
 ﻿// app/tickets.tsx
-import { useMemo } from "react";
-import { Platform, Linking, FlatList } from "react-native";
-import { Card, Button, Text } from "react-native-paper";
-import ScreenShell from "./components/ScreenShell";
+import React, { useMemo, useState } from "react";
+import { View, Text, TextInput, StyleSheet, ScrollView, Linking, TouchableOpacity } from "react-native";
+import programme from "../assets/programme.json"; // put your programme JSON here
 
-// Build-time import so it works on GitHub Pages
-const rawProgramme = require("./assets/programme.json") as any[];
+type EventRow = {
+  id?: string;
+  title?: string;
+  time?: string;
+  date?: string;
+  venue?: string;
+  tickets_url?: string;
+  description?: string;
+};
 
-function coerceUrl(u: any): string | null {
-  if (!u) return null;
-  const s = String(u).trim();
-  if (!s) return null;
-  if (/^https?:\/\//i.test(s)) return s;
-  // turn relative paths into absolute site URLs
-  return `https://woordfees.co.za/${s.replace(/^\/+/, "")}`;
-}
+export default function TicketsScreen() {
+  const [q, setQ] = useState("");
 
-function getTitle(r: any, i: number) {
-  return r.title ?? r.Produksie ?? r.name ?? `Item ${i + 1}`;
-}
+  const rows: EventRow[] = Array.isArray(programme) ? (programme as any) : [];
 
-function getTicketsUrl(r: any) {
-  return (
-    r.tickets_url ??
-    r.ticket_url ??
-    r.ticketsUrl ??
-    r.Tickets ??
-    r.kaartjies_url ??
-    r.buy_tickets ??
-    r.buy_url ??
-    r.url ??
-    null
-  );
-}
-
-type TicketItem = { id: string | number; title: string; url: string };
-
-function mapRow(r: any, i: number): TicketItem | null {
-  const url = coerceUrl(getTicketsUrl(r));
-  if (!url) return null;
-  return {
-    id: r.id ?? i,
-    title: getTitle(r, i),
-    url,
-  };
-}
-
-function openUrl(url: string) {
-  if (Platform.OS === "web") {
-    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
-  } else {
-    Linking.openURL(url);
-  }
-}
-
-export default function Tickets() {
-  const items = useMemo(
-    () =>
-      (Array.isArray(rawProgramme) ? rawProgramme.map(mapRow).filter(Boolean) : []) as TicketItem[],
-    []
-  );
+  const filtered = useMemo(() => {
+    if (!q.trim()) return rows;
+    const s = q.toLowerCase();
+    return rows.filter((r) =>
+      [r.title, r.venue, r.description].filter(Boolean).some((t: any) => String(t).toLowerCase().includes(s))
+    );
+  }, [q, rows]);
 
   return (
-    <ScreenShell title="Kaartjies" scroll={false}>
-      {items.length === 0 ? (
-        <Card style={{ borderRadius: 16 }}>
-          <Card.Content>
-            <Text variant="titleSmall" style={{ marginBottom: 6 }}>
-              Geen kaartjie-skakels gevind nie
-            </Text>
-            <Text variant="bodySmall">
-              Maak seker <Text style={{ fontWeight: "700" }}>app/assets/programme.json</Text> bevat ’n
-              veld soos <Text style={{ fontWeight: "700" }}>tickets_url</Text> /{" "}
-              <Text style={{ fontWeight: "700" }}>ticket_url</Text> /{" "}
-              <Text style={{ fontWeight: "700" }}>buy_url</Text>.
-            </Text>
-          </Card.Content>
-        </Card>
-      ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(it) => String(it.id)}
-          contentContainerStyle={{ paddingBottom: 24, gap: 12 }}
-          renderItem={({ item }) => (
-            <Card style={{ borderRadius: 16, backgroundColor: "white" }}>
-              <Card.Content>
-                <Text variant="titleMedium" style={{ fontWeight: "700", marginBottom: 6 }}>
-                  {item.title}
-                </Text>
-                <Button mode="contained" onPress={() => openUrl(item.url)}>
-                  Koop kaartjies
-                </Button>
-              </Card.Content>
-            </Card>
+    <ScrollView style={styles.page} contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Kaartjies</Text>
+      <TextInput
+        style={styles.search}
+        placeholder="Soek ’n produksie…"
+        value={q}
+        onChangeText={setQ}
+      />
+
+      {filtered.map((ev, i) => (
+        <View key={ev.id ?? i} style={styles.card}>
+          <Text style={styles.cardTitle}>{ev.title ?? "Onbekende item"}</Text>
+          <Text style={styles.meta}>
+            {ev.date ? `${ev.date}` : ""}{ev.time ? ` • ${ev.time}` : ""}{ev.venue ? ` • ${ev.venue}` : ""}
+          </Text>
+          {!!ev.description && <Text style={styles.desc}>{ev.description}</Text>}
+
+          {!!ev.tickets_url && (
+            <TouchableOpacity onPress={() => Linking.openURL(ev.tickets_url)} style={styles.cta}>
+              <Text style={styles.ctaText}>Koop kaartjies</Text>
+            </TouchableOpacity>
           )}
-        />
-      )}
-    </ScreenShell>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: "#FFF" },
+  container: { padding: 16, paddingBottom: 40 },
+  title: { fontSize: 20, fontWeight: "700", color: "#1B5E20", marginBottom: 12 },
+  search: {
+    borderWidth: 1, borderColor: "#FF7E79", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, marginBottom: 12,
+  },
+  card: { backgroundColor: "#fff", borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: "#eee" },
+  cardTitle: { fontSize: 16, fontWeight: "700", marginBottom: 6 },
+  meta: { color: "#666", marginBottom: 6 },
+  desc: { color: "#333", marginBottom: 10 },
+  cta: { backgroundColor: "#FF7E79", paddingVertical: 10, borderRadius: 10, alignItems: "center" },
+  ctaText: { color: "#fff", fontWeight: "700" },
+});
