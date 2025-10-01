@@ -1,31 +1,22 @@
 ﻿// app/components/ScreenShell.tsx
-import React, { ReactNode } from "react";
-import { ScrollView, View, ViewStyle } from "react-native";
-import { useTheme } from "react-native-paper";
-import BrandHeader from "../../components/BrandHeader"; // Header lives at repo-root/components
+import React, { PropsWithChildren } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { Text } from "react-native-paper";
 
-type Props = {
-  title: string;
-  children: ReactNode;
-  /** Set false if the screen renders its own FlatList (so it controls scrolling). */
-  scroll?: boolean;
-  /** Optional extra styles for the inner content container. */
-  contentStyle?: ViewStyle;
-};
+type Props = PropsWithChildren<{ title?: string; scroll?: boolean }>;
 
-export default function ScreenShell({
-  title,
-  children,
-  scroll = true,
-  contentStyle,
-}: Props) {
-  const { colors } = useTheme();
-  const Body: any = scroll ? ScrollView : View;
-
-  return (
-    <Body style={{ flex: 1, backgroundColor: colors.background }}>
-      <BrandHeader title={title} />
-      <View style={[{ padding: 16 }, contentStyle]}>{children}</View>
-    </Body>
+export default function ScreenShell({ title, scroll = true, children }: Props) {
+  const Content = (
+    <View style={styles.inner}>
+      {!!title && <Text variant="titleLarge" style={styles.title}>{title}</Text>}
+      {children}
+    </View>
   );
+  return scroll ? <ScrollView style={styles.page}>{Content}</ScrollView> : <View style={styles.page}>{Content}</View>;
 }
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: "#FFF" },
+  inner: { padding: 16, paddingBottom: 32, gap: 12 },
+  title: { fontWeight: "700", color: "#1B5E20", marginBottom: 4 },
+});
