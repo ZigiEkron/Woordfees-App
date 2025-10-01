@@ -1,15 +1,37 @@
-﻿import { useMemo } from "react";
-import { Platform, Linking, FlatList } from "react-native";
+﻿// app/schedule.tsx
+import React, { useMemo, useState, useEffect } from "react";
+import { Platform, Linking, FlatList, View, TextInput, StyleSheet } from "react-native";
 import { Card, Button, Text } from "react-native-paper";
+import { useLocalSearchParams } from "expo-router";
 import ScreenShell from "./components/ScreenShell";
-import { formatMapLink } from "../lib/venues";
 
+// -------- Helpers (self-contained) --------
+function formatMapLink(a: number | string, b?: number, label?: string) {
+  if (typeof a === "number" && typeof b === "number") {
+    const q = `${a},${b}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}${
+      label ? `&query_place_id=${encodeURIComponent(label)}` : ""
+    }`;
+  }
+  const q = String(a);
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+}
+function openUrl(url: string) {
+  if (Platform.OS === "web") {
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+  } else {
+    Linking.openURL(url);
+  }
+}
+
+// -------- Data --------
 const rawProgramme = require("./assets/programme.json") as any[];
 const rawVenues = require("./assets/venues.json") as Array<{ slug?: string; name: string; lat?: number; lng?: number; address?: string }>;
 
 const venuesBySlug = Object.fromEntries(rawVenues.filter(v => v.slug).map(v => [String(v.slug).toLowerCase(), v]));
 const venuesByName = Object.fromEntries(rawVenues.map(v => [String(v.name).toLowerCase(), v]));
 
+// -------- Normalisers --------
 function coerceUrl(u: any): string | null {
   if (!u) return null;
   const s = String(u).trim();
@@ -51,36 +73,58 @@ function resolveVenue(r: any) {
   if (slug) return { label: slug.replace(/-/g, " "), mapUrl: formatMapLink(slug) };
   return { label: "Venue", mapUrl: "https://www.google.com/maps" };
 }
-function openUrl(url: string) {
-  if (Platform.OS === "web") {
-    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
-  } else {
-    Linking.openURL(url);
-  }
-}
+
+// -------- Types & mapping --------
 type EventItem = { id: string | number; title: string; description: string; venueLabel: string; venueMapUrl: string; ticketsUrl: string | null; };
 function mapRow(r: any, i: number): EventItem {
   const { label, mapUrl } = resolveVenue(r);
   return { id: r.id ?? i, title: getTitle(r, i), description: getDescription(r), venueLabel: label, venueMapUrl: mapUrl, ticketsUrl: coerceUrl(getTicketsUrl(r)) };
 }
 
+// -------- Screen --------
 export default function Schedule() {
   const items = useMemo<EventItem[]>(() => (Array.isArray(rawProgramme) ? rawProgramme.map(mapRow) : []), []);
+  const { q } = useLocalSearchParams<{ q?: string }>();
+  const [query, setQuery] = useState("");
+
+  // Prefill from ?q=
+  useEffect(() => {
+    if (typeof q === "string") setQuery(q);
+  }, [q]);
+
+  const filtered = useMemo(() => {
+    const s = query.trim().toLowerCase();
+    if (!s) return items;
+    return items.filter(ev =>
+      [ev.title, ev.description, ev.venueLabel]
+        .filter(Boolean)
+        .some(t => String(t).toLowerCase().includes(s))
+    );
+  }, [items, query]);
+
   return (
     <ScreenShell title="Program" scroll={false}>
-      {items.length === 0 ? (
+      {/* Soekvenster */}
+      <View style={styles.searchRow}>
+        <TextInput
+          placeholder="Soek produksies, venues of beskrywings…"
+          value={query}
+          onChangeText={setQuery}
+          style={styles.searchInput}
+          returnKeyType="search"
+        />
+      </View>
+
+      {filtered.length === 0 ? (
         <Card style={{ borderRadius: 16 }}>
           <Card.Content>
-            <Text variant="titleSmall" style={{ marginBottom: 6 }}>Geen items om te wys nie</Text>
-            <Text variant="bodySmall">
-              Kontroleer asseblief <Text style={{ fontWeight: "700" }}>app/assets/programme.json</Text> en{" "}
-              <Text style={{ fontWeight: "700" }}>app/assets/venues.json</Text>.
-            </Text>
+            <Text variant="titleSmall" style={{ marginBottom: 6 }}>Geen items gevind nie</Text>
+            <Text variant="bodySmall">Probeer ’n ander soekterm.</Text>
           </Card.Content>
         </Card>
       ) : (
         <FlatList
-          data={items}
+          data={filtered}
           keyExtractor={(it) => String(it.id)}
           contentContainerStyle={{ paddingBottom: 24, gap: 16 }}
           renderItem={({ item: ev }) => (
@@ -105,3 +149,11 @@ export default function Schedule() {
     </ScreenShell>
   );
 }
+
+const styles = StyleSheet.create({
+  searchRow: { marginBottom: 8 },
+  searchInput: {
+    borderWidth: 1, borderColor: "#FF7E79", borderRadius: 12,
+    paddingVertical: 10, paddingHorizontal: 12,
+  },
+});
