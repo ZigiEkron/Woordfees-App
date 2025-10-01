@@ -1,20 +1,35 @@
 // app/map.tsx
 import React from "react";
-import { ScrollView, Text, StyleSheet, View } from "react-native";
-import { WebView } from "react-native-webview"; // If not using this, keep your existing iframe approach
+import { ScrollView, Text, StyleSheet, View, Platform, Linking, TouchableOpacity } from "react-native";
 
 export default function MapScreen() {
+  const iframeSrc =
+    "https://www.google.com/maps/d/embed?mid=YOUR_MAP_ID_HERE"; // <- put your real embed URL here
+
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.container}>
       <Text style={styles.title}>Map & Venues</Text>
+
       <View style={styles.mapShell}>
-        {/* Keep your existing <iframe> string in WebView, or your current map component */}
-        <WebView
-          source={{
-            html: `<iframe src="https://www.google.com/maps/d/embed?mid=..." width="100%" height="450" style="border:0"></iframe>`,
-          }}
-          style={{ height: 460 }}
-        />
+        {Platform.OS === "web" ? (
+          // NOTE: JSX 'iframe' is valid on web builds. TypeScript may warn, but it compiles.
+          // @ts-ignore - intrinsic web element
+          <iframe
+            src={iframeSrc}
+            width="100%"
+            height="460"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        ) : (
+          <TouchableOpacity
+            style={styles.cta}
+            onPress={() => Linking.openURL("https://www.google.com/maps/search/?api=1&query=Stellenbosch")}
+          >
+            <Text style={styles.ctaText}>Open Map in Google Maps</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
@@ -25,4 +40,6 @@ const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 40 },
   title: { fontSize: 20, fontWeight: "700", color: "#1B5E20", marginBottom: 12 },
   mapShell: { borderRadius: 12, overflow: "hidden", borderWidth: 1, borderColor: "#eee" },
+  cta: { backgroundColor: "#FF7E79", paddingVertical: 14, borderRadius: 10, alignItems: "center" },
+  ctaText: { color: "#fff", fontWeight: "700" },
 });
